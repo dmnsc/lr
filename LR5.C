@@ -6,10 +6,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-void printbin(int i);
+void printBin(int i);
 int bcdtoi(int i);
-void printtime();
-void FreeClock(void);
+void printTime();
+void waitFreeClock(void);
 
 int tmiliseconds;
 
@@ -17,7 +17,7 @@ int tmiliseconds;
 void DisableClockUpdate(void)
 {
     unsigned char c;
-    FreeClock();
+    waitFreeClock();
     outp(0x70, 0x0B);
     c = inp(0x71);
     c |= 0x80;
@@ -28,7 +28,7 @@ void DisableClockUpdate(void)
 void EnableClockUpdate(void)
 {
     unsigned char c;
-    FreeClock();
+    waitFreeClock();
     outp(0x70, 0x0B);
     c = inp(0x71);
     c &= 0x7F;
@@ -36,7 +36,7 @@ void EnableClockUpdate(void)
     outp(0x71, c);
 }
 
-void FreeClock(void)
+void waitFreeClock(void)
 {
     unsigned char c = 1;
     int i = 50;
@@ -48,7 +48,7 @@ void FreeClock(void)
     }
 }
 
-void printbin(int i)
+void printBin(int i)
 {
     char str[10];
     itoa(i + 256, str, 2);
@@ -60,23 +60,23 @@ int bcdtoi(int i)
     return i % 16 + i / 16 * 10;
 }
 
-int rtc_read(int reg)
+int rtcRead(int reg)
 {
     outp(0x70, reg);
     return inp(0x71);
 }
 
-void printtime()
+void printTime()
 {
     char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 
-    int seconds = rtc_read(0);
-    int minutes = rtc_read(2);
-    int hours = rtc_read(4);
-    int weekday = rtc_read(6);
-    int day = rtc_read(7);
-    int month = rtc_read(8);
-    int year = rtc_read(9);
+    int seconds = rtcRead(0);
+    int minutes = rtcRead(2);
+    int hours = rtcRead(4);
+    int weekday = rtcRead(6);
+    int day = rtcRead(7);
+    int month = rtcRead(8);
+    int year = rtcRead(9);
 
     printf("Current time: %x:%02x:%02x %s %02x.%02x.20%02x    \r",
         hours, minutes, seconds, weekday_names[weekday - 1], day, month, year);
@@ -87,7 +87,7 @@ void printtime()
 {
 while (1)
 {
-printtime();
+printTime();
 }
 }*/
 
@@ -100,7 +100,7 @@ void delay(int delay)
         //delay_milliseconds++;
         //fflush(stdout);
     }
-    FreeClock();
+    waitFreeClock();
 }
 
 /*void interrupt far int70_custom(void)
@@ -135,7 +135,7 @@ int main()
         {
         case '1':
             //clock();
-            printtime();
+            printTime();
             break;
         case '2':
             printf("Set time");

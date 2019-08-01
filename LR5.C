@@ -16,71 +16,71 @@ int tmiliseconds;
 
 void DisableClockUpdate(void)
 {
-	unsigned char c;
-	FreeClock();
-	outp(0x70, 0x0B);
-	c = inp(0x71);
-	c |= 0x80;
-	outp(0x70, 0x0B);
-	outp(0x71, c);
+    unsigned char c;
+    FreeClock();
+    outp(0x70, 0x0B);
+    c = inp(0x71);
+    c |= 0x80;
+    outp(0x70, 0x0B);
+    outp(0x71, c);
 }
 
 void EnableClockUpdate(void)
 {
-	unsigned char c;
-	FreeClock();
-	outp(0x70, 0x0B);
-	c = inp(0x71);
-	c &= 0x7F;
-	outp(0x70, 0x0B);
-	outp(0x71, c);
+    unsigned char c;
+    FreeClock();
+    outp(0x70, 0x0B);
+    c = inp(0x71);
+    c &= 0x7F;
+    outp(0x70, 0x0B);
+    outp(0x71, c);
 }
 
 void FreeClock(void)
 {
-	unsigned char c = 1;
-	int i = 50;
-	while (c && (i > 0))
-	{
-		outp(0x70, 0x0A);
-		c = inp(0x71) & 0x80;
-		i--;
-	}
+    unsigned char c = 1;
+    int i = 50;
+    while (c && (i > 0))
+    {
+        outp(0x70, 0x0A);
+        c = inp(0x71) & 0x80;
+        i--;
+    }
 }
 
 void printbin(int i)
 {
-	char str[10];
-	itoa(i + 256, str, 2);
-	printf("%s ", str + 1);
+    char str[10];
+    itoa(i + 256, str, 2);
+    printf("%s ", str + 1);
 }
 
 int bcdtoi(int i)
 {
-	return i % 16 + i / 16 * 10;
+    return i % 16 + i / 16 * 10;
 }
 
 int rtc_read(int reg)
 {
-	outp(0x70, reg);
-	return inp(0x71);
+    outp(0x70, reg);
+    return inp(0x71);
 }
 
 void printtime()
 {
-	char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
+    char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 
-	int seconds = rtc_read(0);
-	int minutes = rtc_read(2);
-	int hours = rtc_read(4);
-	int weekday = rtc_read(6);
-	int day = rtc_read(7);
-	int month = rtc_read(8);
-	int year = rtc_read(9);
+    int seconds = rtc_read(0);
+    int minutes = rtc_read(2);
+    int hours = rtc_read(4);
+    int weekday = rtc_read(6);
+    int day = rtc_read(7);
+    int month = rtc_read(8);
+    int year = rtc_read(9);
 
-	printf("Current time: %x:%02x:%02x %s %02x.%02x.20%02x    \r",
-		hours, minutes, seconds, weekday_names[weekday - 1], day, month, year);
-	fflush(stdout);
+    printf("Current time: %x:%02x:%02x %s %02x.%02x.20%02x    \r",
+        hours, minutes, seconds, weekday_names[weekday - 1], day, month, year);
+    fflush(stdout);
 }
 
 /*void clock()
@@ -93,14 +93,14 @@ printtime();
 
 void delay(int delay)
 {
-	delay_milliseconds = 0;
-	while (delay_milliseconds != delay)
-	{
-		//printf("%d time left \n", delay_milliseconds);
-		//delay_milliseconds++;
-		//fflush(stdout);
-	}
-	FreeClock();
+    delay_milliseconds = 0;
+    while (delay_milliseconds != delay)
+    {
+        //printf("%d time left \n", delay_milliseconds);
+        //delay_milliseconds++;
+        //fflush(stdout);
+    }
+    FreeClock();
 }
 
 /*void interrupt far int70_custom(void)
@@ -122,37 +122,37 @@ outp(0xA0, 0x20);
 
 int main()
 {
-	int t;
-	int s;
-	system("cls");
-	printf("\nRomashko M.D. LR_5 724403 \n LR2 Chasy realnogo vremeni\n");
-	printf("\n\n1 - Show time \n2 - Set time \n3 - Set delay \n4 Exit\n\n");
+    int t;
+    int s;
+    system("cls");
+    printf("\nRomashko M.D. LR_5 724403 \n LR2 Chasy realnogo vremeni\n");
+    printf("\n\n1 - Show time \n2 - Set time \n3 - Set delay \n4 Exit\n\n");
 
-	while (1)
-	{
-		s = getch();
-		switch (s)
-		{
-		case '1':
-			//clock();
-			printtime();
-			break;
-		case '2':
-			printf("Set time");
-			printf("\n");
-			break;
-		case '3':
-			printf("Set delay");
-			delay(5000);
-			printf("\n");
-			break;
-		case '4':
-			printf("\n");
-			system("pause");
-			return 0;
-		default:  printf("\nOshibka vvoda!\n");
-			break;
-		}
-	}
-	return 0;
+    while (1)
+    {
+        s = getch();
+        switch (s)
+        {
+        case '1':
+            //clock();
+            printtime();
+            break;
+        case '2':
+            printf("Set time");
+            printf("\n");
+            break;
+        case '3':
+            printf("Set delay");
+            delay(5000);
+            printf("\n");
+            break;
+        case '4':
+            printf("\n");
+            system("pause");
+            return 0;
+        default:  printf("\nOshibka vvoda!\n");
+            break;
+        }
+    }
+    return 0;
 }

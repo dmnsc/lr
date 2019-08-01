@@ -11,7 +11,7 @@ int bcdtoi(int i);
 void printTime();
 void waitFreeClock(void);
 
-int tmiliseconds;
+int delay_milliseconds;
 
 
 void DisableClockUpdate(void)
@@ -91,14 +91,14 @@ printTime();
 }
 }*/
 
-void delay(int delay)
+void delayMs(int delay)
 {
     delay_milliseconds = 0;
     while (delay_milliseconds != delay)
     {
-        //printf("%d time left \n", delay_milliseconds);
-        //delay_milliseconds++;
-        //fflush(stdout);
+        printf("%d time left \n", delay_milliseconds);
+        delay_milliseconds++;
+        fflush(stdout);
     }
     waitFreeClock();
 }
@@ -143,7 +143,7 @@ int main()
             break;
         case '3':
             printf("Set delay");
-            delay(5000);
+            delayMs(5000);
             printf("\n");
             break;
         case '4':

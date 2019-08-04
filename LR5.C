@@ -10,6 +10,7 @@ void printBin(int i);
 int bcdtoi(int i);
 void printTime();
 void waitFreeClock(void);
+void printMenu(void);
 
 unsigned int delay_milliseconds;
 unsigned int seconds;
@@ -119,32 +120,43 @@ void rtcSet()
     ////
     int newhour;
     printf(" New hours: \n");
-    scanf("%x", newhour);
-    rtcWrite(0x0B, rtcRead(0x0B) | 0x80); // use DisableClockUpdate
-    outp(0x71, 0x04);
-    outp(0x70, newhour); // NB! newhour variable encoding!!!
+    scanf("%x", newhour); //"%x" for hex value??
+   //rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
+    DisableClockUpdate();  // use DisableClockUpdate
 
-    rtcWrite(0x0B, rtcRead(0x0B) & 0x80);
+    outp(0x71, 0x04); //hours
+    outp(0x70, newhour); // NB! newhour variable encoding!!! -- new hour variable
+
+    EnableClockUpdate();
+    //rtcWrite(0x0B, rtcRead(0x0B) & 0x80); //Enabled??????
     ////
     printTime();
+}
+
+void printMenu(void)
+{
+    system("cls");
+    printf("\nRomashko M.D. LR_5 724403 \n LR2 Chasy realnogo vremeni\n");
+    printf("\n\n1 - Show time \n2 - Set time \n3 - Set delay \n4 Exit\n\n");
 }
 
 int main()
 {
     int t;
     int s;
-    system("cls");
+   /* system("cls");
     printf("\nRomashko M.D. LR_5 724403 \n LR2 Chasy realnogo vremeni\n");
-    printf("\n\n1 - Show time \n2 - Set time \n3 - Set delay \n4 Exit\n\n");
+    printf("\n\n1 - Show time \n2 - Set time \n3 - Set delay \n4 Exit\n\n");*/
+
 
     while (1)
     {
+        printMenu();
         s = getch();
         switch (s)
         {
         case '1':
             clock();
-            //printTime();
             break;
         case '2':
             printf("Set time");
@@ -160,7 +172,8 @@ int main()
             printf("\n");
             system("pause");
             return 0;
-        default:  printf("\nOshibka vvoda!\n");
+        default: 
+            printf("\nPlease consider picking any menu option.\n");
             break;
         }
     }

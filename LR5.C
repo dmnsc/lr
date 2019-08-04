@@ -80,6 +80,8 @@ void printTime()
     char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 
     // TODO: Clock update must be disabled here
+    rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
+    //???
     int seconds = rtcRead(0);
     int minutes = rtcRead(2);
     int hours = rtcRead(4);
@@ -88,6 +90,8 @@ void printTime()
     int month = rtcRead(8);
     int year = rtcRead(9);
     // TODO: Clock update must be enabled back here
+    rtcWrite(0x0B, rtcRead(0x0B) & 0x80);
+    //???
 
     printf("Current time: %x:%02x:%02x %s %02x.%02x.20%02x    \r",
         hours, minutes, seconds, weekday_names[weekday - 1], day, month, year);
@@ -96,75 +100,27 @@ void printTime()
 
 void clock()
 {
-while (1) // TODO: loop exit condition!!!
+while(!kbhit()) // TODO: loop exit condition!!!
 {
 printTime();
-// TODO: delay at least 100ms here
+delay(100); // TODO: delay at least 100ms here
 }
 }
 
-void delayMs(int delay)
+void rtcSet()
 {
-    delay_milliseconds = 0;
-    while (delay_milliseconds <= delay)
-    {
-       // printf("%d time left \n", delay_milliseconds);
-        //delay_milliseconds++;
-        //fflush(stdout);
-    }
-    waitFreeClock();// TODO: kill this
+    ////
+    int newhour;
+    printf(" New hours: \n");
+    scanf("%x", newhour);
+    rtcWrite(0x0B, rtcRead(0x0B) | 0x80); // use DisableClockUpdate
+    outp(0x71, 0x04);
+    outp(0x70, newhour); // NB! newhour variable encoding!!!
+
+    rtcWrite(0x0B, rtcRead(0x0B) & 0x80);
+    ////
+    printTime();
 }
-
-void interrupt far int70_custom(void)
-{
-milliseconds++;
-delay_milliseconds++;
-if (milliseconds >= 500)
-{
-milliseconds %= 500;
-UpdateTime();
-}
-outp(0x70, 0x0C); inp(0x71); // equivalent to rtcRead(0x0C)
-
-outp(0x20, 0x20);
-outp(0xA0, 0x20);
-}
-
-/*void interrupt int9_wait(void)
-{
-	inp(0x60);
-	outp(0x20, 0x20);
-}*/
-
-void interrupt int9_any_key(void)
-{
-	unsigned char key = inp(0x60);
-	if (key < 128)
-		anykey = 1;
-	outp(0x20, 0x20);
-}
-
-void rtcSet(int newmin, int newsec, int newhour)
-{
-	outp(0x70, inp(0x0B)|0x80); // piece of shit
-	scanf("%x : %x : %x \n", newhour, newmin, newsec);  // piece of shit
-	waitFreeClock(); // use DisableClockUpdate
-	outp(0x71, 0x04);
-	outp(0x70, newhour); // NB! newhour variable encoding!!!
-	waitFreeClock();
-	outp(0x70, 0x02);
-	outp(0x71, newmin);
-	waitFreeClock();
-	outp(0x71, 0x00);
-	outp(0x70, newsece);
-	waitFreeClock();
-	outp(0x70, inp(0x0B) | 0x80); // piece of shit
-	printTime();
-	//outp(0x70, reg);
-	//return inp(0x71);
-}
-
-//
 
 int main()
 {
@@ -185,11 +141,12 @@ int main()
             break;
         case '2':
             printf("Set time");
+			rtcSet();
             printf("\n");
             break;
         case '3':
             printf("Set delay");
-            delayMs(5000);
+          //  delayMs(5000);
             printf("\n");
             break;
         case '4':

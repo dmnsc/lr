@@ -136,8 +136,8 @@ int main()
         switch (s)
         {
         case '1':
-            //clock();
-            printTime();
+            clock();
+            //printTime();
             break;
         case '2':
             printf("Set time");

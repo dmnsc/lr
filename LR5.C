@@ -83,15 +83,15 @@ void printTime()
     fflush(stdout);
 }
 
-void clock()
+/*void clock()
 {
 while (1)
 {
 printTime();
 }
-}
+}*/
 
-void delayMs(int delay)
+/*void delayMs(int delay)
 {
     delay_milliseconds = 0;
     while (delay_milliseconds != delay)
@@ -101,9 +101,9 @@ void delayMs(int delay)
         //fflush(stdout);
     }
     waitFreeClock();
-}
+}*/
 
-void interrupt far int70_custom(void)
+/*void interrupt far int70_custom(void)
 {
 milliseconds++;
 delay_milliseconds++;
@@ -116,7 +116,7 @@ outp(0x70, 0x0C);
 inp(0x71);
 outp(0x20, 0x20);
 outp(0xA0, 0x20);
-}
+}*/
 
 /*void interrupt int9_wait(void)
 {
@@ -124,32 +124,45 @@ outp(0xA0, 0x20);
 	outp(0x20, 0x20);
 }*/
 
-void interrupt int9_any_key(void)
+/*void interrupt int9_any_key(void)
 {
 	unsigned char key = inp(0x60);
 	if (key < 128)
 		anykey = 1;
 	outp(0x20, 0x20);
-}
+}*/
 
-void rtcSet(int newmin, int newsec, int newhour) 
+void rtcSet() 
 {
+	//int newmin;
+	//int newsec;
+	int newhour;
 	outp(0x70, inp(0x0B)|0x80);
-	scanf("%x : %x : %x \n", newhour, newmin, newsec);
+	printf(" New hours: \n");
+	scanf("%x", newhour);
 	waitFreeClock();
 	outp(0x71, 0x04);
 	outp(0x70, newhour);
-	waitFreeClock();
-	outp(0x70, 0x02);
-	outp(0x71, newmin);
-	waitFreeClock();
-	outp(0x71, 0x00);
-	outp(0x70, newsece);
-	waitFreeClock();
 	outp(0x70, inp(0x0B) | 0x80);
-	printTime();
-	//outp(0x70, reg);
-	//return inp(0x71);
+	printf("succss???\n");
+	//printf(" New minutes:");
+	//scanf("%x", newmin);
+	//printf("\n");
+	//printf(" New seconds:");
+	//scanf("%x", newsec);
+	//printf("\n");
+	//waitFreeClock();
+	//outp(0x71, 0x04);
+	//outp(0x70, newhour);
+	//waitFreeClock();
+	//outp(0x70, 0x02);
+	//outp(0x71, newmin);
+	//waitFreeClock();
+	//outp(0x71, 0x00);
+//	outp(0x70, newsec);
+	//waitFreeClock();
+	//outp(0x70, inp(0x0B) | 0x80);
+	//printTime();
 }
 
 //
@@ -173,11 +186,12 @@ int main()
             break;
         case '2':
             printf("Set time");
+			rtcSet();
             printf("\n");
             break;
         case '3':
             printf("Set delay");
-            delayMs(5000);
+          //  delayMs(5000);
             printf("\n");
             break;
         case '4':

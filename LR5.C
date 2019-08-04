@@ -11,7 +11,14 @@ int bcdtoi(int i);
 void printTime();
 void waitFreeClock(void);
 
-int delay_milliseconds;
+unsigned int delay_milliseconds;
+unsigned int seconds;
+unsigned int minutes;
+unsigned int hours;
+unsigned int weekday;
+unsigned int day;
+unsigned int month;
+unsigned int year;
 
 
 void DisableClockUpdate(void)
@@ -82,13 +89,13 @@ void printTime()
     // TODO: Clock update must be disabled here
     rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
     //???
-    int seconds = rtcRead(0);
-    int minutes = rtcRead(2);
-    int hours = rtcRead(4);
-    int weekday = rtcRead(6);
-    int day = rtcRead(7);
-    int month = rtcRead(8);
-    int year = rtcRead(9);
+    seconds = rtcRead(0);
+    minutes = rtcRead(2);
+    hours = rtcRead(4);
+    weekday = rtcRead(6);
+    day = rtcRead(7);
+    month = rtcRead(8);
+    year = rtcRead(9);
     // TODO: Clock update must be enabled back here
     rtcWrite(0x0B, rtcRead(0x0B) & 0x80);
     //???

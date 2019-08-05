@@ -6,34 +6,24 @@
 #include <string.h>
 #include <stdlib.h>
 
-void printBin(int i);
 int bcdtoi(int i);
 void printTime();
 void waitFreeClock(void);
 void printMenu(void);
+void printBin(int i);
+void EnableClockUpdate(void);
+void DisableClockUpdate(void);
 
 unsigned int delay_milliseconds;
 
 void DisableClockUpdate(void)
 {
-    unsigned char c;
-    waitFreeClock(); // TODO: unnecessary here
-    outp(0x70, 0x0B);// TODO: use rtcRead()
-    c = inp(0x71);
-    c |= 0x80;
-    outp(0x70, 0x0B);// TODO: use rtcWrite()
-    outp(0x71, c);
+    rtcWrite(0x0B, rtcRead(0x0B)|0x80);
 }
 
 void EnableClockUpdate(void)
 {
-    unsigned char c;
-    waitFreeClock(); // TODO: unnecessary here
-    outp(0x70, 0x0B);
-    c = inp(0x71);
-    c &= 0x7F;
-    outp(0x70, 0x0B);
-    outp(0x71, c);
+    rtcWrite(0x0B, rtcRead(0x0B) & 0x7F);
 }
 
 void waitFreeClock(void)
@@ -42,9 +32,7 @@ void waitFreeClock(void)
     int i = 50;
     while (c && (i > 0))
     {
-        // TODO: use rtcRead()
-        outp(0x70, 0x0A);
-        c = inp(0x71) & 0x80;
+        c = rtcRead(0x0A) & 0x80;// TODO: use rtcRead() 
         i--;
     }
 }
@@ -73,12 +61,8 @@ void rtcWrite(unsigned char reg, unsigned char value)
     outp(0x71, value);
 }
 
-// rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
-// outp(0x61, inp(0x61) | 0x01);
-
 void printTime()
 {
-    char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
     unsigned int seconds;
     unsigned int minutes;
     unsigned int hours;
@@ -86,11 +70,9 @@ void printTime()
     unsigned int day;
     unsigned int month;
     unsigned int year;
+    char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 
-    // TODO: Clock update must be disabled here
     DisableClockUpdate();
-    //rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
-    //???
     seconds = rtcRead(0);
     minutes = rtcRead(2);
     hours = rtcRead(4);
@@ -98,10 +80,7 @@ void printTime()
     day = rtcRead(7);
     month = rtcRead(8);
     year = rtcRead(9);
-    // TODO: Clock update must be enabled back here
     EnableClockUpdate();
-    //rtcWrite(0x0B, rtcRead(0x0B) & 0x80);
-    //???
 
     printf("Current time: %x:%02x:%02x %s %02x.%02x.20%02x    \r",
         hours, minutes, seconds, weekday_names[weekday - 1], day, month, year);
@@ -109,30 +88,21 @@ void printTime()
 }
 
 void clock()
-{ // TODO: formatting!!!
-while(!kbhit()) // TODO: loop exit condition!!!
-{
-printTime();
-delay(100); // TODO: delay at least 100ms here
+{ 
+    while(!kbhit()) 
+    {
+        printTime();
+        delay(100);
+    }
 }
-}
 
-void rtcSet() // TODO: use fixed value for debug
+void rtcSet()
 {
-    ////
-    int newhour;
-    printf(" New hours: \n");
-    scanf("%x", newhour); //"%x" for hex value??
-    rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
-    //DisableClockUpdate();  // use DisableClockUpdate
-
-    outp(0x71, 0x04); //hours
-    outp(0x70, newhour); // NB! newhour variable encoding!!! -- new hour variable
-    // TODO: use rtcWrite()
-
-    //EnableClockUpdate();
-    rtcWrite(0x0B, rtcRead(0x0B) & 0x80); //Enabled??????
-    ////
+    unsigned int newhour = 0x19;
+    printf(" New hour: %x \n", newhour); //scanf("%x", newhour); 
+    DisableClockUpdate();
+    rtcWrite(0x04, newhour);
+    EnableClockUpdate(); 
     printTime();
 }
 
@@ -164,7 +134,6 @@ int main()
             break;
         case '3':
             printf("Set delay");
-          //  delayMs(5000);
             printf("\n");
             break;
         case '4':

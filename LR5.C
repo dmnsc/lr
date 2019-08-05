@@ -13,30 +13,22 @@ void waitFreeClock(void);
 void printMenu(void);
 
 unsigned int delay_milliseconds;
-unsigned int seconds;
-unsigned int minutes;
-unsigned int hours;
-unsigned int weekday;
-unsigned int day;
-unsigned int month;
-unsigned int year;
-
 
 void DisableClockUpdate(void)
 {
     unsigned char c;
-    waitFreeClock();
-    outp(0x70, 0x0B);
+    waitFreeClock(); // TODO: unnecessary here
+    outp(0x70, 0x0B);// TODO: use rtcRead()
     c = inp(0x71);
     c |= 0x80;
-    outp(0x70, 0x0B);
+    outp(0x70, 0x0B);// TODO: use rtcWrite()
     outp(0x71, c);
 }
 
 void EnableClockUpdate(void)
 {
     unsigned char c;
-    waitFreeClock();
+    waitFreeClock(); // TODO: unnecessary here
     outp(0x70, 0x0B);
     c = inp(0x71);
     c &= 0x7F;
@@ -50,6 +42,7 @@ void waitFreeClock(void)
     int i = 50;
     while (c && (i > 0))
     {
+        // TODO: use rtcRead()
         outp(0x70, 0x0A);
         c = inp(0x71) & 0x80;
         i--;
@@ -86,6 +79,13 @@ void rtcWrite(unsigned char reg, unsigned char value)
 void printTime()
 {
     char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
+    unsigned int seconds;
+    unsigned int minutes;
+    unsigned int hours;
+    unsigned int weekday;
+    unsigned int day;
+    unsigned int month;
+    unsigned int year;
 
     // TODO: Clock update must be disabled here
     DisableClockUpdate();
@@ -109,7 +109,7 @@ void printTime()
 }
 
 void clock()
-{
+{ // TODO: formatting!!!
 while(!kbhit()) // TODO: loop exit condition!!!
 {
 printTime();
@@ -117,7 +117,7 @@ delay(100); // TODO: delay at least 100ms here
 }
 }
 
-void rtcSet()
+void rtcSet() // TODO: use fixed value for debug
 {
     ////
     int newhour;
@@ -128,6 +128,7 @@ void rtcSet()
 
     outp(0x71, 0x04); //hours
     outp(0x70, newhour); // NB! newhour variable encoding!!! -- new hour variable
+    // TODO: use rtcWrite()
 
     //EnableClockUpdate();
     rtcWrite(0x0B, rtcRead(0x0B) & 0x80); //Enabled??????
@@ -146,10 +147,6 @@ int main()
 {
     int t;
     int s;
-    system("cls");
-    printf("\nRomashko M.D. LR_5 724403 \n LR2 Chasy realnogo vremeni\n");
-    printf("\n\n1 - Show time \n2 - Set time \n3 - Set delay \n4 Exit\n\n");*/
-
 
     while (1)
     {
@@ -162,7 +159,7 @@ int main()
             break;
         case '2':
             printf("Set time");
-			rtcSet();
+            rtcSet();
             printf("\n");
             break;
         case '3':
@@ -174,7 +171,7 @@ int main()
             printf("\n");
             system("pause");
             return 0;
-        default: 
+        default:
             printf("\nPlease consider picking any menu option.\n");
             break;
         }

@@ -88,7 +88,8 @@ void printTime()
     char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 
     // TODO: Clock update must be disabled here
-    rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
+    DisableClockUpdate();
+    //rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
     //???
     seconds = rtcRead(0);
     minutes = rtcRead(2);
@@ -98,7 +99,8 @@ void printTime()
     month = rtcRead(8);
     year = rtcRead(9);
     // TODO: Clock update must be enabled back here
-    rtcWrite(0x0B, rtcRead(0x0B) & 0x80);
+    EnableClockUpdate();
+    //rtcWrite(0x0B, rtcRead(0x0B) & 0x80);
     //???
 
     printf("Current time: %x:%02x:%02x %s %02x.%02x.20%02x    \r",
@@ -121,14 +123,14 @@ void rtcSet()
     int newhour;
     printf(" New hours: \n");
     scanf("%x", newhour); //"%x" for hex value??
-   //rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
-    DisableClockUpdate();  // use DisableClockUpdate
+    rtcWrite(0x0B, rtcRead(0x0B) | 0x80);
+    //DisableClockUpdate();  // use DisableClockUpdate
 
     outp(0x71, 0x04); //hours
     outp(0x70, newhour); // NB! newhour variable encoding!!! -- new hour variable
 
-    EnableClockUpdate();
-    //rtcWrite(0x0B, rtcRead(0x0B) & 0x80); //Enabled??????
+    //EnableClockUpdate();
+    rtcWrite(0x0B, rtcRead(0x0B) & 0x80); //Enabled??????
     ////
     printTime();
 }
@@ -144,7 +146,7 @@ int main()
 {
     int t;
     int s;
-   /* system("cls");
+    system("cls");
     printf("\nRomashko M.D. LR_5 724403 \n LR2 Chasy realnogo vremeni\n");
     printf("\n\n1 - Show time \n2 - Set time \n3 - Set delay \n4 Exit\n\n");*/
 

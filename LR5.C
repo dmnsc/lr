@@ -7,6 +7,8 @@
 #include <stdlib.h>
 
 int bcdtoi(int i);
+unsigned char rtcRead(unsigned char reg);
+void rtcWrite(unsigned char reg, unsigned char value);
 void printTime();
 void waitFreeClock(void);
 void printMenu(void);
@@ -32,7 +34,7 @@ void waitFreeClock(void)
     int i = 50;
     while (c && (i > 0))
     {
-        c = rtcRead(0x0A) & 0x80;// TODO: use rtcRead() 
+        c = rtcRead(0x0A) & 0x80;// TODO: use rtcRead() ??
         i--;
     }
 }
@@ -98,7 +100,7 @@ void clock()
 
 void rtcSet()
 {
-    unsigned int newhour = 0x19;
+    unsigned int newhour = 0x13;
     printf(" New hour: %x \n", newhour); //scanf("%x", newhour); 
     DisableClockUpdate();
     rtcWrite(0x04, newhour);
@@ -117,7 +119,6 @@ int main()
 {
     int t;
     int s;
-
     while (1)
     {
         printMenu();
@@ -130,10 +131,14 @@ int main()
         case '2':
             printf("Set time");
             rtcSet();
+            printTime();
+            printf("\n");
+            system("pause");
             printf("\n");
             break;
         case '3':
             printf("Set delay");
+            system("pause");
             printf("\n");
             break;
         case '4':

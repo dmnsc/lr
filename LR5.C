@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+unsigned int delay_milliseconds;
 int bcdtoi(int i);
 unsigned char rtcRead(unsigned char reg);
 void rtcWrite(unsigned char reg, unsigned char value);
@@ -15,8 +16,6 @@ void printMenu(void);
 void printBin(int i);
 void EnableClockUpdate(void);
 void DisableClockUpdate(void);
-
-unsigned int delay_milliseconds;
 
 void DisableClockUpdate(void)
 {
@@ -101,11 +100,39 @@ void clock()
 void rtcSet()
 {
     unsigned int newhour = 0x13;
-    printf(" New hour: %x \n", newhour); //scanf("%x", newhour); 
+    unsigned int newmin = 0x13;
+    unsigned int newsec = 0x13;
+    unsigned int newday = 0x13;
+    unsigned int newmonth) = 0x13;
+    unsigned int newyear = 0x13;
+    printf(" New hour: "); 
+    scanf("%x", newhour); 
+    printf("\n");
+    printf(" New minute: ");
+    scanf("%x", newmin);
+    printf("\n");
+    printf(" New second: ");
+    scanf("%x", newsec);
+    printf("\n");
+    printf(" New day: ");
+    scanf("%x", newday);
+    printf("\n");
+    printf(" New month: ");
+    scanf("%x", newmonth);
+    printf("\n");
+    printf(" New year: ");
+    scanf("%x", newyear);
+    printf("\n");
     DisableClockUpdate();
     rtcWrite(0x04, newhour);
+    rtcWrite(0x02, newmin);
+    rtcWrite(0x00, newsec);
+    rtcWrite(0x07, newday);
+    rtcWrite(0x08, newmonth);
+    rtcWrite(0x09, newyear);
     EnableClockUpdate(); 
-    printTime();
+    printf("New time: %x:%02x:%02x  %02x.%02x.20%02x    \n",
+        newhour, newmin, newsec, newday, newmonth, newyear);
 }
 
 void printMenu(void)

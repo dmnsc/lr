@@ -159,7 +159,6 @@ unsigned char countWeekday(unsigned char year, unsigned char month, unsigned cha
     unsigned char newWeekday;
     unsigned char monthCode;
     unsigned char yearCode;
-
     if (month == 1 || month == 10)               monthCode = 1;
     if (month == 5)                              monthCode = 2;
     if (month == 8)                              monthCode = 3;
@@ -168,7 +167,14 @@ unsigned char countWeekday(unsigned char year, unsigned char month, unsigned cha
     if (month == 12 || month == 9)               monthCode = 6;
     if (month == 4 || month == 7)                monthCode = 0;
     yearCode = (6 + year + year / 4) % 7;
-    newWeekday = (day + monthCode + yearCode)%7;
+    if (year % 4 != 0)
+    {
+        newWeekday = (day + monthCode + yearCode) % 7;
+    }
+    if (year % 4 = 0)
+    {
+        newWeekday = (day + monthCode + yearCode) % 7 - 1;
+    }
     return newWeekday;
 }
 

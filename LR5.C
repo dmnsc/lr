@@ -22,6 +22,7 @@ void clock(void);
 void rtcSet(void);
 unsigned char countWeekday(unsigned char year, unsigned char month, unsigned char day );
 unsigned int delay_milliseconds;
+unsigned int milliseconds;
 char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 
 void DisableClockUpdate(void)
@@ -180,10 +181,31 @@ unsigned char countWeekday(unsigned char year, unsigned char month, unsigned cha
 
 void interrupt far int70_custom(void)
 {
-    outp(0x70, 0x0C);
-    inp(0x71);
+    milliseconds++;
+    delay_milliseconds++;
+    if (milliseconds >= 500)
+    {
+        milliseconds %= 500;
+        UpdateTime();
+    }
     outp(0x20, 0x20);
     outp(0xA0, 0x20);
+}
+
+void CreateDelay(int delay)
+{
+    delay_milliseconds = 0;
+    while (delay_milliseconds != delay)
+    {
+    }
+    FreeClock();
+}
+
+void interrupt int9_wait(void)
+{
+   
+    inp(0x60);
+    outp(0x20, 0x20);
 }
 
 void printMenu(void)
@@ -251,6 +273,9 @@ int main()
             break;
         case '3':
             printf("Set delay");
+            disable();
+            setvect(0x09, int9_wait);
+            enable();
             system("pause");
             printf("\n");
             break;
@@ -270,8 +295,3 @@ int main()
     setvect(0x70, int70_normal);
     return 0;
 }
-
-/*-rtcSet function complete
-- new function countWeekday added(to find day of the week without reading registers, used in rtcSet function.Has an issue of running into an error if the year is--)
-- new printRegister function added
-- new printRegistersRealtime function added*/

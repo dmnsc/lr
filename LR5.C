@@ -18,11 +18,12 @@ unsigned int bcdtoi(int i);
 unsigned char rtcRead(unsigned char reg);
 void printRegisters(void);
 void printRegistersRealtime(void);
+void EnablePeriodicInterrupt(void);
 void clock(void);
 void rtcSet(void);
 unsigned char countWeekday(unsigned char year, unsigned char month, unsigned char day );
-unsigned int delay_milliseconds;
-unsigned int milliseconds;
+volatile unsigned int delay_milliseconds;
+volatile unsigned int milliseconds;
 char *weekday_names[] = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
 
 void DisableClockUpdate(void)
@@ -33,6 +34,11 @@ void DisableClockUpdate(void)
 void EnableClockUpdate(void)
 {
     rtcWrite(0x0B, rtcRead(0x0B) & 0x7F);
+}
+
+void EnablePeriodicInterrupt(void)
+{
+    rtcWrite(0x0B, rtcRead(0x0B) | 0x40);
 }
 
 void waitFreeClock(void)
@@ -106,11 +112,12 @@ void clock()
 
 void printRegistersRealtime()
 {
+    clrscr();
     while (!kbhit())
     {
         printRegisters();
+        gotoxy(0,0);
         delay(100);
-        system("cls");
     }
 }
 
@@ -172,7 +179,7 @@ unsigned char countWeekday(unsigned char year, unsigned char month, unsigned cha
     {
         newWeekday = (day + monthCode + yearCode) % 7;
     }
-    if (year % 4 = 0)
+    if (year % 4 == 0)
     {
         newWeekday = (day + monthCode + yearCode) % 7 - 1;
     }
@@ -183,11 +190,8 @@ void interrupt far int70_custom(void)
 {
     milliseconds++;
     delay_milliseconds++;
-    if (milliseconds >= 500)
-    {
-        milliseconds %= 500;
-        UpdateTime();
-    }
+    outp(0x70, 0x0C);
+    inp(0x71);
     outp(0x20, 0x20);
     outp(0xA0, 0x20);
 }
@@ -195,15 +199,15 @@ void interrupt far int70_custom(void)
 void CreateDelay(int delay)
 {
     delay_milliseconds = 0;
-    while (delay_milliseconds != delay)
+    while (delay_milliseconds >= delay)
     {
+        printf("%d\r", delay_milliseconds);
     }
-    FreeClock();
+    waitFreeClock();
 }
 
 void interrupt int9_wait(void)
 {
-   
     inp(0x60);
     outp(0x20, 0x20);
 }
@@ -252,6 +256,7 @@ int main()
 {
     int t;
     int s;
+    EnablePeriodicInterrupt();
     int70_normal = getvect(0x70);
     setvect(0x70, int70_custom);
     while (1)
@@ -272,7 +277,8 @@ int main()
             printf("\n");
             break;
         case '3':
-            printf("Set delay");
+            printf("Set delay\n");
+            CreateDelay(15000);
             disable();
             setvect(0x09, int9_wait);
             enable();
